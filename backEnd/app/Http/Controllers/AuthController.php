@@ -3,10 +3,22 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
     public function register(Request $request){
-        return "all ok";
+        // $request->validate([
+        //     'first_name'=>'required|string|max:255',
+        //     'last_name' => 'required|string|max:255',
+        //     'email'=>'required|string|email|max:255|unique:users',
+        //     'password'=>'required|string|min:8|confirmed'
+        // ]);
+
+        return response()->json([
+            'message' => 'success'
+        ]);
+
+        
     }
 }

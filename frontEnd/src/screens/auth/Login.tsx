@@ -1,8 +1,6 @@
-import { useActionState, useEffect, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router";
 import logoImage from "../../assets/themes/images/logo/logo1.png";
-import axios from "axios";
-import instance from "../../config/axios";
 import useAuth from "../../context/useAuth";
 
 function Login() {
@@ -11,9 +9,32 @@ function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [usernameError, setUsernameError] = useState<string | null>(null);
+
+  const validateInformation = () => {
+    setUsernameError(null);
+    setPasswordError(null);
+
+    if (username.length < 5) {
+      setUsernameError("Username must be at least 5 characters long.");
+      return false;
+    }
+    if (password.length < 8) {
+      setPasswordError("Password must be at least 8 characters long.");
+      return false;
+    }
+    return true;
+  };
 
   const handleLogin = async () => {
     setIsLoading(true);
+
+    if (!validateInformation()) {
+      setIsLoading(false);
+      return;
+    }
+
     try {
       login(username, password);
     } catch (error) {
@@ -58,6 +79,15 @@ function Login() {
                     </p>
                     <div className="form-group">
                       <label className="col-form-label">Email Address</label>
+                      {usernameError && (
+                        <p
+                          style={{
+                            color: "red",
+                          }}
+                        >
+                          {usernameError}
+                        </p>
+                      )}
                       <input
                         className="form-control"
                         type="text"
@@ -69,6 +99,15 @@ function Login() {
                     </div>
                     <div className="form-group">
                       <label className="col-form-label">Password</label>
+                      {passwordError && (
+                        <p
+                          style={{
+                            color: "red",
+                          }}
+                        >
+                          {passwordError}
+                        </p>
+                      )}
                       <div className="form-input position-relative">
                         <input
                           className="form-control"

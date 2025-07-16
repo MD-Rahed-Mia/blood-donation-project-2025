@@ -7,7 +7,7 @@ import { PiCaretLeftBold } from "react-icons/pi";
 import { RiAccountCircleLine } from "react-icons/ri";
 import { IoMdNotificationsOutline } from "react-icons/io";
 import { CiLogout } from "react-icons/ci";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import useAuth from "../../context/useAuth";
 
 function Header() {
@@ -34,7 +34,8 @@ function Header() {
   };
 
   const HeaderMenus = () => {
-    const { logout } = useAuth();
+    const { logout, user } = useAuth();
+    const navigate = useNavigate();
 
     return (
       <div>
@@ -51,15 +52,29 @@ function Header() {
               Notification
             </a>
           </li>
-          <li
-            className="d-flex gap-2 px-3 py-2 border-ligt border-top border-1"
-            onClick={() => logout()}
-          >
-            <CiLogout color="#308e87" size={20} />
-            <a className="ms-2" href="#">
-              Log out
-            </a>
-          </li>
+          {user !== null ? (
+            <li
+              className="d-flex gap-2 px-3 py-2 border-ligt border-top border-1"
+              onClick={() => logout()}
+            >
+              <CiLogout color="#308e87" size={20} />
+              <a className="ms-2" href="#">
+                Log out
+              </a>
+            </li>
+          ) : (
+            <li
+              className="d-flex gap-2 px-3 py-2 border-ligt border-top border-1"
+              onClick={() => {
+                navigate("/login");
+              }}
+            >
+              <CiLogout color="#308e87" size={20} />
+              <a className="ms-2" href="#">
+                Login
+              </a>
+            </li>
+          )}
         </ul>
       </div>
     );

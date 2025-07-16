@@ -1,7 +1,7 @@
 import axios from "axios";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import instance from "../config/axios";
-import { Navigate, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 
 interface AuthContextType {
   loading: boolean;
@@ -37,7 +37,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       return data;
     } catch (error) {
       console.error("failed to login", error);
-      throw error; 
+      throw error;
     } finally {
       setLoading(false);
     }
@@ -58,9 +58,10 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const logout = async () => {
+    console.log("click on logout.");
     try {
-      localStorage.removeItem("accessToken");
       setUser(null);
+      navigate("/login");
     } catch (error) {
       console.log("error ", error);
     }
@@ -68,25 +69,25 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   //   for restore user season.
 
-  useEffect(() => {
-    const accessToken = localStorage.getItem("accessToken");
-    setLoading(true);
-    instance
-      .get("/auth/me", {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      })
-      .then((data) => {
-        setUser(data.data);
-      })
-      .catch((error) => {
-        console.log("no access token found: ", error);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, []);
+  // useEffect(() => {
+  //   const accessToken = localStorage.getItem("accessToken");
+  //   setLoading(true);
+  //   instance
+  //     .get("/auth/me", {
+  //       headers: {
+  //         Authorization: `Bearer ${accessToken}`,
+  //       },
+  //     })
+  //     .then((data) => {
+  //       setUser(data.data);
+  //     })
+  //     .catch((error) => {
+  //       console.log("no access token found: ", error);
+  //     })
+  //     .finally(() => {
+  //       setLoading(false);
+  //     });
+  // }, []);
 
   return (
     <AuthContext.Provider

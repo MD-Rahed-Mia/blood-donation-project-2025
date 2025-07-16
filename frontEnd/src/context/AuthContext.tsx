@@ -8,7 +8,7 @@ interface AuthContextType {
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
   user: any;
   setUser: React.Dispatch<React.SetStateAction<any>>;
-  login: (username: string, password: string) => void;
+  login: (email: string, password: string) => void;
   logout: () => void;
 }
 
@@ -19,27 +19,33 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
 
-  const login = async (username: string, password: string) => {
+  const login = async (email: string, password: string) => {
     try {
       setLoading(true);
-      const { data } = await instance.post("/auth/login", {
-        username,
+      const { data } = await instance.post("/login", {
+        email,
         password,
       });
 
-      const userInfo = await getCurrentUser(data.token || data.accessToken);
+      navigate("/");
+      setUser({
+        ...data.data,
+        role: "user",
+      });
 
-      if (userInfo) {
-        localStorage.setItem("accessToken", data.accessToken);
+      // const userInfo = await getCurrentUser(data.token || data.accessToken);
 
-        setUser(userInfo);
-        if (userInfo && userInfo.role === "admin") {
-          console.log("user info : ", userInfo);
-          navigate("/dashboard");
-        } else {
-          navigate("/");
-        }
-      }
+      // if (userInfo) {
+      //   localStorage.setItem("accessToken", data.accessToken);
+
+      //   setUser(userInfo);
+      //   if (userInfo && userInfo.role === "admin") {
+      //     console.log("user info : ", userInfo);
+      //     navigate("/dashboard");
+      //   } else {
+      //     navigate("/");
+      //   }
+      // }
     } catch (error) {
       console.log("failed to login", error);
     } finally {

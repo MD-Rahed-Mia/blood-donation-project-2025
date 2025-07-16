@@ -1,9 +1,115 @@
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router";
 import logoImage from "../../assets/themes/images/logo/logo1.png";
+import instance from "../../config/axios";
+
+interface SignType {
+  first_name: string;
+  last_name: string;
+  email: string;
+  password: string;
+  agrement: boolean;
+}
+
+interface ErrorType {
+  first_name: null | string;
+  last_name: null | string;
+  email: null | string;
+  password: null | string;
+  agrement: string | null;
+}
 
 function SignUp() {
   const [showPassword, setShowPassword] = useState(false);
+  const [formData, setFormdata] = useState<SignType>({
+    first_name: "",
+    last_name: "",
+    email: "",
+    password: "",
+    agrement: false,
+  });
+  const [error, setError] = useState<ErrorType>({
+    first_name: null,
+    last_name: null,
+    email: null,
+    password: null,
+    agrement: null,
+  });
+
+  function validate(): boolean {
+    if (formData.first_name.length < 3) {
+      setError((prev) => ({ ...prev, first_name: "Invalid first name." }));
+      return false;
+    } else if (formData.last_name.length < 3) {
+      setError((prev) => ({ ...prev, last_name: "Invalid last name." }));
+      return false;
+    } else if (formData.email.length < 7) {
+      setError((prev) => ({ ...prev, email: "Invalid Email." }));
+      return false;
+    } else if (formData.password.length < 8) {
+      setError((prev) => ({
+        ...prev,
+        password: "Invalid Password. Minimum required 8 characters and more.",
+      }));
+      return false;
+    } else if (formData.agrement !== true) {
+      setError((prev) => ({
+        ...prev,
+        agrement: "Please check you are agree our terms.",
+      }));
+      return false;
+    }
+
+    return true;
+  }
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setError({
+      first_name: null,
+      last_name: null,
+      email: null,
+      password: null,
+      agrement: null,
+    });
+    if (!validate()) {
+      return;
+    }
+
+    try {
+      const { data } = await instance.post(
+        "/register",
+        {
+          first_name: formData.first_name,
+          last_name: formData.last_name,
+          email: formData.email,
+          password: formData.password,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      console.log("result:", data);
+    } catch (error) {
+      console.log("There is an erro: ", error.message);
+      if (error.response) {
+        console.log("error: ", error.response.data.data?.email[0])
+        alert(error.response.data.data?.email[0])
+      }
+    }
+  }
+
+  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const { name, value } = e.target;
+    setFormdata((prev) => ({ ...prev, [name]: value }));
+  }
+
+  function handleAgrement() {
+    setFormdata((prev) => ({ ...prev, agrement: !prev.agrement }));
+  }
 
   return (
     <div>
@@ -27,49 +133,83 @@ function SignUp() {
                   </a>
                 </div>
                 <div className="login-main">
-                  <form className="theme-form">
+                  <form className="theme-form" onSubmit={handleSubmit}>
                     <h2 className="text-center">Create your account</h2>
                     <p className="text-center">
                       Enter your personal details to create account
                     </p>
                     <div className="form-group">
-                      <label className="col-form-label pt-0">Your Name</label>
+                      <label className="col-form-label pt-0">
+                        Your Name
+                        <span className="text-danger">
+                          {error.first_name && error.first_name}
+                        </span>
+                      </label>
                       <div className="row g-2">
+                        <span className="text-danger">
+                          {error.last_name && error.last_name}
+                        </span>
+
                         <div className="col-6">
                           <input
-                            className="form-control"
+                            className={`form-control  ${
+                              error.first_name !== null ? "border-danger" : null
+                            }                          }`}
                             type="text"
                             required
                             placeholder="First name"
+                            onChange={handleChange}
+                            name="first_name"
                           />
                         </div>
                         <div className="col-6">
                           <input
-                            className="form-control"
+                            className={`form-control  ${
+                              error.last_name !== null ? "border-danger" : null
+                            }                          }`}
                             type="text"
                             required
                             placeholder="Last name"
+                            name="last_name"
+                            onChange={handleChange}
                           />
                         </div>
                       </div>
                     </div>
                     <div className="form-group">
-                      <label className="col-form-label">Email Address</label>
+                      <label className="col-form-label">
+                        Email Address{" "}
+                        <span className="text-danger">
+                          {error.email && error.email}
+                        </span>
+                      </label>
                       <input
-                        className="form-control"
+                        className={`form-control  ${
+                          error.email !== null ? "border-danger" : null
+                        }                          }`}
                         type="email"
                         required
                         placeholder="Test@gmail.com"
+                        name="email"
+                        onChange={handleChange}
                       />
                     </div>
                     <div className="form-group">
-                      <label className="col-form-label">Password</label>
+                      <label className="col-form-label">
+                        Password{" "}
+                        <span className="text-danger">
+                          {error.password && error.password}
+                        </span>{" "}
+                      </label>
                       <div className="form-input position-relative">
                         <input
-                          className="form-control"
+                          className={`form-control  ${
+                            error.password !== null ? "border-danger" : null
+                          }                          }`}
                           type={showPassword ? "text" : "password"}
-                          name="login[password]"
+                          name="password"
                           placeholder="*********"
+                          onChange={handleChange}
                         />
                         <div
                           className="show-hide"
@@ -86,7 +226,12 @@ function SignUp() {
                           className="form-check-input"
                           id="solid6"
                           type="checkbox"
+                          checked={formData.agrement}
+                          onChange={handleAgrement}
                         />
+                        <span className="text-danger">
+                          {error.agrement && error.agrement}
+                        </span>
                         <label className="form-check-label" htmlFor="solid6">
                           Agree with
                         </label>

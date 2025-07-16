@@ -7,7 +7,7 @@ function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const { login } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
-  const [username, setUsername] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [usernameError, setUsernameError] = useState<string | null>(null);
@@ -16,7 +16,7 @@ function Login() {
     setUsernameError(null);
     setPasswordError(null);
 
-    if (username.length < 5) {
+    if (email.length < 5) {
       setUsernameError("Username must be at least 5 characters long.");
       return false;
     }
@@ -36,7 +36,7 @@ function Login() {
     }
 
     try {
-      login(username, password);
+      login(email, password);
     } catch (error) {
       console.log("error : ", error);
     } finally {
@@ -93,8 +93,8 @@ function Login() {
                         type="text"
                         required
                         placeholder="Test@gmail.com"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
                       />
                     </div>
                     <div className="form-group">

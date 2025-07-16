@@ -3,3 +3,20 @@
   margin: 0;
   box-sizing: border-box;
 }
+
+.default-background {
+  background: #f54040;
+  background: radial-gradient(
+    circle,
+    rgba(245, 64, 64, 0.33) 19%,
+    rgba(237, 192, 192, 0.4) 55%,
+    rgba(253, 29, 29, 0.23) 95%
+  );
+}
+.green {
+  color: "#00bc52";
+}
+
+.bg-green-c {
+  background-color: "#00bc52" !important;
+}

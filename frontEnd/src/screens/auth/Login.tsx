@@ -11,6 +11,7 @@ function Login() {
   const [password, setPassword] = useState<string>("");
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [usernameError, setUsernameError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const validateInformation = () => {
     setUsernameError(null);
@@ -29,6 +30,7 @@ function Login() {
 
   const handleLogin = async () => {
     setIsLoading(true);
+    setError(null);
 
     if (!validateInformation()) {
       setIsLoading(false);
@@ -36,9 +38,16 @@ function Login() {
     }
 
     try {
-      login(email, password);
+      const result = await login(email, password);
+
+      console.log("result : ", result);
     } catch (error) {
       console.log("error : ", error);
+
+      const message =
+      error?.response?.data?.message || error.message || "Login failed";
+    console.log("Login error:", message);
+    setError(message);
     } finally {
       setIsLoading(false);
     }
@@ -74,9 +83,13 @@ function Login() {
                     }}
                   >
                     <h2 className="text-center">Sign in to account</h2>
+
                     <p className="text-center">
                       Enter your email &amp; password to login
                     </p>
+                    {error && (
+                      <h6 className="text-danger text-capitalize text-center my-2">{error}</h6>
+                    )}
                     <div className="form-group">
                       <label className="col-form-label">Email Address</label>
                       {usernameError && (

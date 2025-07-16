@@ -35,6 +35,7 @@ function SignUp() {
     password: null,
     agrement: null,
   });
+  const [errorResponse, setErrorResponse] = useState<string | null>(null);
 
   function validate(): boolean {
     if (formData.first_name.length < 3) {
@@ -64,6 +65,7 @@ function SignUp() {
   }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    setErrorResponse(null);
     e.preventDefault();
     setError({
       first_name: null,
@@ -91,13 +93,13 @@ function SignUp() {
           },
         }
       );
-
-      console.log("result:", data);
+      return data;
     } catch (error) {
       console.log("There is an erro: ", error.message);
       if (error.response) {
-        console.log("error: ", error.response.data.data?.email[0])
-        alert(error.response.data.data?.email[0])
+        console.log("error: ", error.response.data.data?.email[0]);
+
+        setErrorResponse(error.response.data.data?.email[0]);
       }
     }
   }
@@ -138,6 +140,11 @@ function SignUp() {
                     <p className="text-center">
                       Enter your personal details to create account
                     </p>
+                    {errorResponse && (
+                      <h4 className="text-danger text-center">
+                        {errorResponse}
+                      </h4>
+                    )}
                     <div className="form-group">
                       <label className="col-form-label pt-0">
                         Your Name

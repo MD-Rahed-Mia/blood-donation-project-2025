@@ -19,7 +19,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
 
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string): Promise<any> => {
     try {
       setLoading(true);
       const { data } = await instance.post("/login", {
@@ -27,27 +27,17 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         password,
       });
 
+      if (!data.success) {
+        throw new Error(data.message || "Login failed");
+      }
+
+      setUser({ ...data.data, role: "user" });
       navigate("/");
-      setUser({
-        ...data.data,
-        role: "user",
-      });
 
-      // const userInfo = await getCurrentUser(data.token || data.accessToken);
-
-      // if (userInfo) {
-      //   localStorage.setItem("accessToken", data.accessToken);
-
-      //   setUser(userInfo);
-      //   if (userInfo && userInfo.role === "admin") {
-      //     console.log("user info : ", userInfo);
-      //     navigate("/dashboard");
-      //   } else {
-      //     navigate("/");
-      //   }
-      // }
+      return data;
     } catch (error) {
-      console.log("failed to login", error);
+      console.error("failed to login", error);
+      throw error; 
     } finally {
       setLoading(false);
     }
